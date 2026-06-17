@@ -3,48 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello World</title>
+  <meta name="description" content="Hugh Jordan's first web project — a clean, modern landing page.">
+  <title>Hello, World</title>
   <style>
-    * {
+    *, *::before, *::after {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
     body {
+      min-height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      background-color: #f0f4f8;
-      font-family: Georgia, 'Times New Roman', serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #e2e8f0;
+      padding: 2rem;
     }
 
-    .container {
+    .card {
       text-align: center;
-      padding: 2rem 3rem;
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 3.5rem 4rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      max-width: 560px;
+      width: 100%;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #63b3ed;
+      background: rgba(99, 179, 237, 0.1);
+      border: 1px solid rgba(99, 179, 237, 0.25);
+      border-radius: 999px;
+      padding: 0.35rem 1rem;
+      margin-bottom: 1.5rem;
     }
 
     h1 {
-      font-size: 3rem;
-      color: #2d3748;
-      letter-spacing: 0.02em;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: #f7fafc;
+      margin-bottom: 1rem;
     }
 
-    p {
-      margin-top: 1rem;
-      font-size: 1rem;
-      color: #718096;
+    h1 span {
+      background: linear-gradient(90deg, #63b3ed, #76e4f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      color: #a0aec0;
+      line-height: 1.65;
+      margin-bottom: 2.25rem;
+    }
+
+    .cta {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background: linear-gradient(90deg, #3182ce, #2b6cb0);
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 4px 15px rgba(49, 130, 206, 0.35);
+    }
+
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(49, 130, 206, 0.5);
+    }
+
+    .cta:active {
+      transform: translateY(0);
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      font-size: 0.8rem;
+      color: #4a5568;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Hello, World!</h1>
-    <p>Welcome to my first webpage.</p>
+  <div class="card">
+    <div class="badge">First Project</div>
+    <h1>Hello, <span>World.</span></h1>
+    <p class="subtitle">Building things on the web, one line at a time.<br>This is where it starts.</p>
+    <a href="https://github.com/hughjordancs-sketch/my-first-agent" class="cta">View on GitHub</a>
   </div>
+  <footer>Made by Hugh Jordan</footer>
 </body>
 </html>
