@@ -1,244 +1,1052 @@
 <!DOCTYPE html>
 <!--
-  index.html — Hugh Jordan's personal landing page
-  A self-contained static page: no external dependencies, no build step.
+  index.html — Airbnb-style rental dashboard
+  Self-contained static page: no external dependencies, no build step.
+  Built by a multi-agent team: UX designer, FE engineers (header, listings), security engineer.
   Open directly in any modern browser or serve from any static host.
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Hugh Jordan — building on the web, one line at a time.">
-  <meta property="og:title" content="Hugh Jordan">
-  <meta property="og:description" content="Building on the web, one line at a time.">
+  <meta name="description" content="Find unique places to stay with local hosts in 191 countries.">
+  <meta property="og:title" content="airbnb">
+  <meta property="og:description" content="Find unique places to stay with local hosts in 191 countries.">
   <meta property="og:type" content="website">
-  <title>Hugh Jordan</title>
+
+  <!-- Security (Security Engineer) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'self' https://picsum.photos; font-src 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
+
+  <title>airbnb</title>
+
+  <!-- ============================================================
+       Design Tokens & Global Styles — UX Designer
+       ============================================================ -->
   <style>
-    *, *::before, *::after {
+    /* ==========================================================================
+       Design Tokens & Base Styles — Airbnb-style Rental Dashboard
+       ========================================================================== */
+
+    :root {
+      /* Colors */
+      --color-primary:  #FF385C;
+      --color-dark:     #222222;
+      --color-mid:      #717171;
+      --color-light:    #DDDDDD;
+      --color-bg:       #FFFFFF;
+      --color-surface:  #F7F7F7;
+
+      /* Spacing scale (4 px base) */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+      --space-7: 48px;
+      --space-8: 64px;
+
+      /* Border radii */
+      --radius-sm:   8px;
+      --radius-md:   12px;
+      --radius-lg:   24px;
+      --radius-pill: 999px;
+
+      /* Shadows */
+      --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.06),
+                    0 1px 3px rgba(0, 0, 0, 0.10);
+      --shadow-md:  0 4px 6px  rgba(0, 0, 0, 0.07),
+                    0 8px 24px rgba(0, 0, 0, 0.10);
+      --shadow-lg:  0 8px 16px rgba(0, 0, 0, 0.08),
+                    0 24px 48px rgba(0, 0, 0, 0.14);
+
+      /* Transitions */
+      --transition-fast: 0.15s ease;
+      --transition-base: 0.25s ease;
+    }
+
+    *,
+    *::before,
+    *::after {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-color: #0d1117;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-      background-size: 24px 24px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: #e2e8f0;
-      padding: 2rem;
-      overflow-x: clip;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--color-dark);
+      background: var(--color-bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    body::before,
-    body::after {
-      content: '';
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.2;
-      pointer-events: none;
-      z-index: 0;
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
-    body::before {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, #3182ce, transparent 70%);
-      top: -120px;
-      right: -100px;
-      animation: drift 12s ease-in-out infinite alternate;
-    }
-
-    body::after {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, #805ad5, transparent 70%);
-      bottom: -100px;
-      left: -80px;
-      animation: drift 15s ease-in-out infinite alternate-reverse;
-    }
-
-    @keyframes drift {
-      from { transform: translate(0, 0); }
-      to   { transform: translate(40px, 30px); }
-    }
-
-    @keyframes rise {
-      from {
-        opacity: 0;
-        transform: translateY(24px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    *:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 3px;
+      border-radius: var(--radius-sm);
     }
 
     @media (prefers-reduced-motion: reduce) {
-      body::before,
-      body::after { animation: none; }
-      .card, footer { animation: none; opacity: 1; transform: none; }
+      * {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+
+  <!-- ============================================================
+       Header Component Styles — FE Engineer (Header)
+       ============================================================ -->
+  <style>
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #ffffff;
+      border-bottom: 1px solid #DDDDDD;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 0 24px;
+      height: 80px;
+
+      transition: box-shadow 0.15s ease;
     }
 
-    main {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 560px;
+    .site-header.scrolled {
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
     }
 
-    .card {
-      text-align: center;
-      padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 6vw, 4rem);
-      background: #1a2035;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-
-    @supports not (backdrop-filter: blur(1px)) {
-      .card { background: #1a2035; }
-    }
-
-    .badge {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #63b3ed;
-      background: rgba(99, 179, 237, 0.1);
-      border: 1px solid rgba(99, 179, 237, 0.3);
-      border-radius: 999px;
-      padding: 0.35rem 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      color: #76e4f7;
-      margin-bottom: 1rem;
-    }
-
-    h1 .plain { color: #f7fafc; }
-
-    h1 .gradient {
-      background: linear-gradient(90deg, #63b3ed, #76e4f7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .subtitle {
-      font-size: 1.05rem;
-      color: #a0aec0;
-      line-height: 1.65;
-      margin-bottom: 2.25rem;
-    }
-
-    .cta {
-      display: inline-block;
-      padding: 0.8rem 2rem;
-      background: linear-gradient(135deg, #3182ce, #2b6cb0);
-      color: #fff;
-      font-size: 0.95rem;
-      font-weight: 600;
-      border-radius: 10px;
+    .site-header__logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       text-decoration: none;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-      box-shadow: 0 4px 20px rgba(49, 130, 206, 0.4);
+      color: #FF385C;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      white-space: nowrap;
+      transition: opacity 0.15s ease;
     }
 
-    .cta:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(49, 130, 206, 0.55);
+    .site-header__logo:hover { opacity: 0.85; }
+
+    .site-header__logo-icon {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
     }
 
-    .cta:active {
-      transform: translateY(0);
-      box-shadow: 0 4px 20px rgba(49, 130, 206, 0.4);
+    .site-header__logo-wordmark { color: #FF385C; }
+
+    .site-header__search {
+      justify-self: center;
+      width: 100%;
+      max-width: 580px;
     }
 
-    .cta:focus-visible {
-      outline: 2px solid #76e4f7;
-      outline-offset: 4px;
-    }
-
-    .icon-links {
+    .site-header__search-pill {
       display: flex;
-      justify-content: center;
-      gap: 0.75rem;
-      margin-top: 1.5rem;
+      align-items: center;
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #DDDDDD;
+      border-radius: 999px;
+      padding: 0;
+      cursor: pointer;
+      font-family: inherit;
+      transition: box-shadow 0.15s ease;
+      overflow: hidden;
     }
 
-    .icon-link {
+    .site-header__search-pill:hover {
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+    }
+
+    .site-header__search-sections {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 0 4px 0 0;
+    }
+
+    .site-header__search-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 10px 18px;
+      flex: 1;
+      min-width: 0;
+      text-align: left;
+      border-radius: 999px;
+      transition: background 0.15s ease;
+    }
+
+    .site-header__search-section:hover { background: #f7f7f7; }
+
+    .site-header__search-section--guests {
+      flex: 0 1 auto;
+      white-space: nowrap;
+    }
+
+    .site-header__search-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #222222;
+      line-height: 1.2;
+      pointer-events: none;
+    }
+
+    .site-header__search-value {
+      font-size: 13px;
+      color: #222222;
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .site-header__search-value--placeholder { color: #717171; }
+
+    .site-header__search-divider {
+      width: 1px;
+      height: 28px;
+      background: #DDDDDD;
+      flex-shrink: 0;
+    }
+
+    .site-header__search-btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 2.25rem;
-      height: 2.25rem;
-      border-radius: 8px;
-      color: #718096;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      width: 48px;
+      height: 48px;
+      background: #FF385C;
+      border-radius: 999px;
+      flex-shrink: 0;
+      margin: 4px;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .site-header__search-pill:hover .site-header__search-btn { background: #e0314f; }
+    .site-header__search-btn:hover { transform: scale(1.05); }
+    .site-header__search-btn svg { width: 18px; height: 18px; }
+
+    .site-header__search-compact {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      width: 100%;
+    }
+
+    .site-header__search-compact-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .site-header__search-compact-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #222222;
+    }
+
+    .site-header__user-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      justify-content: flex-end;
+    }
+
+    .site-header__host-link {
+      display: inline-block;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #222222;
       text-decoration: none;
-      transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+      border-radius: 999px;
+      white-space: nowrap;
+      transition: background 0.15s ease;
     }
 
-    .icon-link:hover {
-      color: #e2e8f0;
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: translateY(-2px);
+    .site-header__host-link:hover { background: #f7f7f7; }
+
+    .site-header__icon-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: transparent;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      color: #222222;
+      transition: background 0.15s ease;
     }
 
-    .icon-link:focus-visible {
-      outline: 2px solid #76e4f7;
+    .site-header__icon-btn:hover { background: #f7f7f7; }
+    .site-header__icon-btn svg { width: 16px; height: 16px; }
+
+    .site-header__user-menu {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 6px 6px 12px;
+      background: #ffffff;
+      border: 1px solid #DDDDDD;
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: box-shadow 0.15s ease;
+    }
+
+    .site-header__user-menu:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16); }
+
+    .site-header__hamburger { width: 16px; height: 16px; color: #222222; }
+
+    .site-header__avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background: #717171;
+      border-radius: 999px;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    @media (max-width: 767px) {
+      .site-header {
+        grid-template-columns: auto 1fr auto;
+        padding: 0 16px;
+        height: 72px;
+        gap: 8px;
+      }
+
+      .site-header__search-sections { display: none; }
+      .site-header__search-compact { display: flex; }
+      .site-header__host-link { display: none; }
+      .site-header__user-nav { gap: 2px; }
+      .site-header__user-menu { padding: 5px 5px 5px 10px; gap: 8px; }
+      .site-header__logo-wordmark { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .site-header__icon-btn { width: 36px; height: 36px; }
+    }
+  </style>
+
+  <!-- ============================================================
+       Category Bar & Listings Styles — FE Engineer (Listings)
+       ============================================================ -->
+  <style>
+    .category-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-light);
+      padding: 0 24px;
+      box-sizing: border-box;
+    }
+
+    .category-bar__scroll {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding: 12px 0;
+    }
+
+    .category-bar__scroll::-webkit-scrollbar { display: none; }
+
+    .category-bar__pill {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px 10px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      color: var(--color-mid);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
       outline-offset: 4px;
     }
 
-    .icon-link svg {
-      width: 1.1rem;
-      height: 1.1rem;
-      fill: currentColor;
+    .category-bar__pill:hover {
+      color: var(--color-dark);
+      border-bottom-color: var(--color-light);
     }
 
-    footer {
-      position: relative;
-      z-index: 1;
-      margin-top: 2rem;
-      font-size: 0.8rem;
-      color: #718096;
-      animation: rise 0.6s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+    .category-bar__pill--active {
+      color: var(--color-dark);
+      font-weight: 600;
+      border-bottom-color: var(--color-dark);
     }
+
+    .category-bar__icon { display: block; width: 20px; height: 20px; flex-shrink: 0; }
+
+    .category-bar__controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      padding: 12px 0;
+    }
+
+    .category-bar__filters-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-dark);
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-dark);
+      transition: background var(--transition-fast), box-shadow var(--transition-fast);
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .category-bar__filters-btn:hover { background: #f7f7f7; box-shadow: var(--shadow-md); }
+
+    .category-bar__toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .category-bar__toggle-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-dark);
+    }
+
+    .category-bar__toggle { position: relative; display: inline-flex; align-items: center; }
+
+    .category-bar__toggle-input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+    .category-bar__toggle-track {
+      width: 44px;
+      height: 24px;
+      background: var(--color-light);
+      border-radius: var(--radius-pill);
+      position: relative;
+      transition: background var(--transition-fast);
+      flex-shrink: 0;
+    }
+
+    .category-bar__toggle-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: var(--color-bg);
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+      transition: transform var(--transition-fast);
+    }
+
+    .category-bar__toggle-input:checked ~ .category-bar__toggle-track { background: var(--color-dark); }
+
+    .category-bar__toggle-input:checked ~ .category-bar__toggle-track .category-bar__toggle-thumb {
+      transform: translateX(20px);
+    }
+
+    .category-bar__toggle-input:focus-visible ~ .category-bar__toggle-track {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    .listings-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      padding: 32px 24px;
+      background: var(--color-bg);
+    }
+
+    @media (max-width: 1024px) {
+      .listings-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 24px 20px; }
+    }
+
+    @media (max-width: 640px) {
+      .listings-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 20px 16px; }
+    }
+
+    .listings-grid__card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .listings-grid__photo-wrap {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--color-light);
+    }
+
+    .listings-grid__photo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .listings-grid__card:hover .listings-grid__photo { transform: scale(1.04); }
+
+    .listings-grid__save {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 1;
+    }
+
+    .listings-grid__save svg path {
+      stroke: white;
+      fill: rgba(0,0,0,0.25);
+      transition: stroke var(--transition-fast), fill var(--transition-fast);
+    }
+
+    .listings-grid__save:hover svg path { stroke: var(--color-primary); fill: var(--color-primary); }
+
+    .listings-grid__info { display: flex; flex-direction: column; gap: 3px; padding: 0 2px; }
+
+    .listings-grid__row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .listings-grid__location {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    .listings-grid__rating {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 13px;
+      color: var(--color-dark);
+      flex-shrink: 0;
+    }
+
+    .listings-grid__distance {
+      margin: 0;
+      font-size: 13px;
+      color: var(--color-mid);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .listings-grid__price { margin: 2px 0 0; font-size: 14px; color: var(--color-dark); }
+    .listings-grid__price strong { font-weight: 600; }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--color-light);
+      padding: 20px 24px;
+      background: var(--color-surface);
+    }
+
+    .site-footer__inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--color-dark);
+    }
+
+    .site-footer__inner a {
+      color: var(--color-dark);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .site-footer__inner a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <main>
-    <div class="card">
-      <div class="badge">First Project</div>
-      <h1><span class="plain">Hello, </span><span class="gradient">World.</span></h1>
-      <p class="subtitle">Building things on the web, one line at a time. This is where it starts.</p>
-      <a href="https://github.com/hughjordancs-sketch/my-first-agent" class="cta">View on GitHub</a>
-      <div class="icon-links">
-        <a href="https://github.com/hughjordancs-sketch" class="icon-link" aria-label="GitHub profile">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+
+  <!-- =====================================================
+       HEADER — FE Engineer (Header)
+       ===================================================== -->
+  <header class="site-header">
+
+    <a class="site-header__logo" href="/" aria-label="airbnb home">
+      <svg class="site-header__logo-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path d="M16 1C10.5 1 6.3 5.5 6.3 11.1c0 3.2 1.5 6 4.1 8.8l5.6 7.6 5.6-7.6c2.6-2.8 4.1-5.6 4.1-8.8C25.7 5.5 21.5 1 16 1zm0 14.5c-2.4 0-4.4-2-4.4-4.4s2-4.4 4.4-4.4 4.4 2 4.4 4.4-2 4.4-4.4 4.4z" fill="#FF385C"/>
+      </svg>
+      <span class="site-header__logo-wordmark">airbnb</span>
+    </a>
+
+    <div class="site-header__search" role="search">
+      <button class="site-header__search-pill" aria-label="Open search">
+        <span class="site-header__search-compact">
+          <svg class="site-header__search-compact-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M13 2a11 11 0 1 0 7.15 19.26l5.3 5.3a1.5 1.5 0 1 0 2.12-2.12l-5.3-5.3A11 11 0 0 0 13 2zm0 3a8 8 0 1 1 0 16A8 8 0 0 1 13 5z" fill="#222222"/>
           </svg>
-        </a>
+          <span class="site-header__search-compact-label">Start your search</span>
+        </span>
+        <span class="site-header__search-sections" aria-hidden="true">
+          <span class="site-header__search-section">
+            <span class="site-header__search-label">Where</span>
+            <span class="site-header__search-value site-header__search-value--placeholder">Search destinations</span>
+          </span>
+          <span class="site-header__search-divider" role="separator"></span>
+          <span class="site-header__search-section">
+            <span class="site-header__search-label">Check in</span>
+            <span class="site-header__search-value site-header__search-value--placeholder">Add dates</span>
+          </span>
+          <span class="site-header__search-divider" role="separator"></span>
+          <span class="site-header__search-section">
+            <span class="site-header__search-label">Check out</span>
+            <span class="site-header__search-value site-header__search-value--placeholder">Add dates</span>
+          </span>
+          <span class="site-header__search-divider" role="separator"></span>
+          <span class="site-header__search-section site-header__search-section--guests">
+            <span class="site-header__search-label">Who</span>
+            <span class="site-header__search-value site-header__search-value--placeholder">Add guests</span>
+          </span>
+          <span class="site-header__search-btn" aria-label="Search">
+            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M13 2a11 11 0 1 0 7.15 19.26l5.3 5.3a1.5 1.5 0 1 0 2.12-2.12l-5.3-5.3A11 11 0 0 0 13 2zm0 3a8 8 0 1 1 0 16A8 8 0 0 1 13 5z" fill="#ffffff"/>
+            </svg>
+          </span>
+        </span>
+      </button>
+    </div>
+
+    <nav class="site-header__user-nav" aria-label="User navigation">
+      <a class="site-header__host-link" href="#">Airbnb your home</a>
+      <button class="site-header__icon-btn" aria-label="Choose a language and currency">
+        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM1.07 8.67h2.2a13.3 13.3 0 0 0 .65 3.04 6.67 6.67 0 0 1-2.85-3.04zM3.27 7.33H1.07a6.67 6.67 0 0 1 2.85-3.04 13.3 13.3 0 0 0-.65 3.04zM7.33 1.45v5.88H4.6a12 12 0 0 1 .74-3.4 6.7 6.7 0 0 0 1.99-2.48zM7.33 8.67v5.88a6.7 6.7 0 0 0-2-.48 12 12 0 0 1-.73-3.4h2.73zM8.67 14.55V8.67h2.73a12 12 0 0 1-.74 3.4 6.7 6.7 0 0 1-1.99 2.48zM8.67 7.33V1.45a6.7 6.7 0 0 1 2 .48 12 12 0 0 1 .73 3.4H8.67zm3.06 4.38a13.3 13.3 0 0 0 .65-3.04h2.2a6.67 6.67 0 0 1-2.85 3.04zm.65-4.38a13.3 13.3 0 0 0-.65-3.04 6.67 6.67 0 0 1 2.85 3.04h-2.2z" fill="currentColor"/>
+        </svg>
+      </button>
+      <button class="site-header__user-menu" aria-label="Open user menu" aria-haspopup="true" aria-expanded="false">
+        <svg class="site-header__hamburger" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="6" y="10" width="20" height="2" rx="1" fill="currentColor"/>
+          <rect x="6" y="15" width="20" height="2" rx="1" fill="currentColor"/>
+          <rect x="6" y="20" width="20" height="2" rx="1" fill="currentColor"/>
+        </svg>
+        <span class="site-header__avatar" aria-hidden="true">HJ</span>
+      </button>
+    </nav>
+
+  </header>
+
+  <!-- =====================================================
+       MAIN — FE Engineer (Listings)
+       ===================================================== -->
+  <main id="main-content">
+
+    <!-- Category Filter Bar -->
+    <div class="category-bar">
+      <div class="category-bar__scroll">
+
+        <button class="category-bar__pill category-bar__pill--active" aria-pressed="true">
+          <svg class="category-bar__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M2 13 Q5 8 10 12 Q15 8 18 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+            <path d="M1 16 Q5 11 10 15 Q15 11 19 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+            <circle cx="10" cy="5" r="2.5" fill="currentColor" opacity="0.4"/>
+          </svg>
+          <span>Beach</span>
+        </button>
+
+        <button class="category-bar__pill" aria-pressed="false">
+          <svg class="category-bar__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <polygon points="10,2 18,17 2,17" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+            <polyline points="6,17 10,9 14,17" stroke="currentColor" stroke-width="1.2" fill="none"/>
+          </svg>
+          <span>Amazing views</span>
+        </button>
+
+        <button class="category-bar__pill" aria-pressed="false">
+          <svg class="category-bar__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="3" y="10" width="14" height="8" rx="1" stroke="currentColor" stroke-width="1.6" fill="none"/>
+            <polyline points="1,11 10,3 19,11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <rect x="7.5" y="13" width="5" height="5" stroke="currentColor" stroke-width="1.4" fill="none"/>
+          </svg>
+          <span>Cabins</span>
+        </button>
+
+        <button class="category-bar__pill" aria-pressed="false">
+          <svg class="category-bar__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M10 2 C10 2 6 6 6 10 C6 13 7.5 14.5 10 15 C12.5 14.5 14 13 14 10 C14 6 10 2 10 2Z" stroke="currentColor" stroke-width="1.6" fill="none"/>
+            <path d="M10 15 L10 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M7 9 C8.5 11 11.5 11 13 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span>Trending</span>
+        </button>
+
+        <button class="category-bar__pill" aria-pressed="false">
+          <svg class="category-bar__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="10" cy="14" rx="8" ry="4" stroke="currentColor" stroke-width="1.6" fill="none"/>
+            <path d="M4 12 Q6 6 10 8 Q14 6 16 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+            <path d="M7 8 Q8 4 10 5 Q12 4 13 8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span>Countryside</span>
+        </button>
+
+        <button class="category-bar__pill" aria-pressed="false">
+          <svg class="category-bar__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="3" y="5" width="14" height="12" rx="1" stroke="currentColor" stroke-width="1.6" fill="none"/>
+            <path d="M3 9 L17 9" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M7 5 L7 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M13 5 L13 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M7 3.5 Q10 1 13 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span>Castles</span>
+        </button>
+
+        <button class="category-bar__pill" aria-pressed="false">
+          <svg class="category-bar__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M10 2 L12.5 7.5 L18 8.2 L14 12 L15 17.5 L10 14.8 L5 17.5 L6 12 L2 8.2 L7.5 7.5 Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span>Luxe</span>
+        </button>
+
+        <button class="category-bar__pill" aria-pressed="false">
+          <svg class="category-bar__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="10" cy="11" rx="7" ry="5" stroke="currentColor" stroke-width="1.6" fill="none"/>
+            <path d="M10 6 Q12 3 14 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+            <path d="M5 9 Q4 6 6 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span>Islands</span>
+        </button>
+
+        <button class="category-bar__pill" aria-pressed="false">
+          <svg class="category-bar__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M3 14 Q5 8 10 10 Q15 8 17 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+            <circle cx="6" cy="6" r="1.5" fill="currentColor" opacity="0.5"/>
+            <circle cx="10" cy="4" r="1.5" fill="currentColor" opacity="0.5"/>
+            <circle cx="14" cy="6" r="1.5" fill="currentColor" opacity="0.5"/>
+            <path d="M3 16 L17 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <span>Arctic</span>
+        </button>
+
+        <button class="category-bar__pill" aria-pressed="false">
+          <svg class="category-bar__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M3 16 Q5 10 8 12 L10 8 L12 12 Q15 10 17 16 Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+            <circle cx="10" cy="5.5" r="2" stroke="currentColor" stroke-width="1.4" fill="none"/>
+            <line x1="10" y1="7.5" x2="10" y2="8.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <span>Camping</span>
+        </button>
+
+        <button class="category-bar__pill" aria-pressed="false">
+          <svg class="category-bar__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="2" y="10" width="16" height="8" rx="1" stroke="currentColor" stroke-width="1.6" fill="none"/>
+            <path d="M5 10 L5 7 Q5 4 8 4 L12 4 Q15 4 15 7 L15 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+            <circle cx="7" cy="14" r="1.2" fill="currentColor" opacity="0.5"/>
+            <circle cx="13" cy="14" r="1.2" fill="currentColor" opacity="0.5"/>
+          </svg>
+          <span>Farms</span>
+        </button>
+
+        <button class="category-bar__pill" aria-pressed="false">
+          <svg class="category-bar__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M10 2 C10 2 4 7 4 12 C4 15.3 6.7 18 10 18 C13.3 18 16 15.3 16 12 C16 7 10 2 10 2Z" stroke="currentColor" stroke-width="1.6" fill="none"/>
+            <path d="M7 12 Q10 9 13 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+            <path d="M8.5 14.5 Q10 13 11.5 14.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span>OMG!</span>
+        </button>
+
+      </div>
+
+      <div class="category-bar__controls">
+        <button class="category-bar__filters-btn" aria-label="Open filters">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <line x1="1" y1="4" x2="15" y2="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="1" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="1" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="5" cy="4" r="2" fill="white" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="11" cy="8" r="2" fill="white" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="5" cy="12" r="2" fill="white" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          Filters
+        </button>
+        <label class="category-bar__toggle-label">
+          <span class="category-bar__toggle-text">Display total before taxes</span>
+          <div class="category-bar__toggle">
+            <input type="checkbox" class="category-bar__toggle-input" aria-label="Display total before taxes"/>
+            <div class="category-bar__toggle-track">
+              <div class="category-bar__toggle-thumb"></div>
+            </div>
+          </div>
+        </label>
       </div>
     </div>
+
+    <!-- Property Listing Grid -->
+    <div class="listings-grid">
+
+      <article class="listings-grid__card">
+        <div class="listings-grid__photo-wrap">
+          <img class="listings-grid__photo" src="https://picsum.photos/seed/10/400/400" alt="Beachfront villa in Malibu, California" loading="lazy"/>
+          <button class="listings-grid__save" aria-label="Save listing">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 17 C10 17 2 11.5 2 6.5 C2 4 4 2 6.5 2 C8 2 9.2 2.8 10 4 C10.8 2.8 12 2 13.5 2 C16 2 18 4 18 6.5 C18 11.5 10 17 10 17Z" stroke="white" stroke-width="1.8" fill="none"/>
+            </svg>
+          </button>
+        </div>
+        <div class="listings-grid__info">
+          <div class="listings-grid__row">
+            <span class="listings-grid__location">Malibu, California</span>
+            <span class="listings-grid__rating">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="#222222" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 1 L7.5 4.5 L11 5 L8.5 7.4 L9.1 11 L6 9.2 L2.9 11 L3.5 7.4 L1 5 L4.5 4.5 Z"/></svg>
+              4.97
+            </span>
+          </div>
+          <p class="listings-grid__distance">312 miles away · Feb 3–8</p>
+          <p class="listings-grid__price"><strong>$289</strong> / night</p>
+        </div>
+      </article>
+
+      <article class="listings-grid__card">
+        <div class="listings-grid__photo-wrap">
+          <img class="listings-grid__photo" src="https://picsum.photos/seed/23/400/400" alt="Mountain retreat in Aspen, Colorado" loading="lazy"/>
+          <button class="listings-grid__save" aria-label="Save listing">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 17 C10 17 2 11.5 2 6.5 C2 4 4 2 6.5 2 C8 2 9.2 2.8 10 4 C10.8 2.8 12 2 13.5 2 C16 2 18 4 18 6.5 C18 11.5 10 17 10 17Z" stroke="white" stroke-width="1.8" fill="none"/>
+            </svg>
+          </button>
+        </div>
+        <div class="listings-grid__info">
+          <div class="listings-grid__row">
+            <span class="listings-grid__location">Aspen, Colorado</span>
+            <span class="listings-grid__rating">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="#222222" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 1 L7.5 4.5 L11 5 L8.5 7.4 L9.1 11 L6 9.2 L2.9 11 L3.5 7.4 L1 5 L4.5 4.5 Z"/></svg>
+              4.92
+            </span>
+          </div>
+          <p class="listings-grid__distance">1,204 miles away · Mar 12–17</p>
+          <p class="listings-grid__price"><strong>$449</strong> / night</p>
+        </div>
+      </article>
+
+      <article class="listings-grid__card">
+        <div class="listings-grid__photo-wrap">
+          <img class="listings-grid__photo" src="https://picsum.photos/seed/37/400/400" alt="Lakeside cabin in Lake Tahoe, Nevada" loading="lazy"/>
+          <button class="listings-grid__save" aria-label="Save listing">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 17 C10 17 2 11.5 2 6.5 C2 4 4 2 6.5 2 C8 2 9.2 2.8 10 4 C10.8 2.8 12 2 13.5 2 C16 2 18 4 18 6.5 C18 11.5 10 17 10 17Z" stroke="white" stroke-width="1.8" fill="none"/>
+            </svg>
+          </button>
+        </div>
+        <div class="listings-grid__info">
+          <div class="listings-grid__row">
+            <span class="listings-grid__location">Lake Tahoe, Nevada</span>
+            <span class="listings-grid__rating">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="#222222" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 1 L7.5 4.5 L11 5 L8.5 7.4 L9.1 11 L6 9.2 L2.9 11 L3.5 7.4 L1 5 L4.5 4.5 Z"/></svg>
+              5.0
+            </span>
+          </div>
+          <p class="listings-grid__distance">548 miles away · Jan 20–25</p>
+          <p class="listings-grid__price"><strong>$189</strong> / night</p>
+        </div>
+      </article>
+
+      <article class="listings-grid__card">
+        <div class="listings-grid__photo-wrap">
+          <img class="listings-grid__photo" src="https://picsum.photos/seed/42/400/400" alt="Coastal bungalow in Tulum, Mexico" loading="lazy"/>
+          <button class="listings-grid__save" aria-label="Save listing">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 17 C10 17 2 11.5 2 6.5 C2 4 4 2 6.5 2 C8 2 9.2 2.8 10 4 C10.8 2.8 12 2 13.5 2 C16 2 18 4 18 6.5 C18 11.5 10 17 10 17Z" stroke="white" stroke-width="1.8" fill="none"/>
+            </svg>
+          </button>
+        </div>
+        <div class="listings-grid__info">
+          <div class="listings-grid__row">
+            <span class="listings-grid__location">Tulum, Mexico</span>
+            <span class="listings-grid__rating">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="#222222" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 1 L7.5 4.5 L11 5 L8.5 7.4 L9.1 11 L6 9.2 L2.9 11 L3.5 7.4 L1 5 L4.5 4.5 Z"/></svg>
+              4.85
+            </span>
+          </div>
+          <p class="listings-grid__distance">1,876 miles away · Apr 1–6</p>
+          <p class="listings-grid__price"><strong>$129</strong> / night</p>
+        </div>
+      </article>
+
+      <article class="listings-grid__card">
+        <div class="listings-grid__photo-wrap">
+          <img class="listings-grid__photo" src="https://picsum.photos/seed/55/400/400" alt="Scottish Highlands estate in Inverness, Scotland" loading="lazy"/>
+          <button class="listings-grid__save" aria-label="Save listing">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 17 C10 17 2 11.5 2 6.5 C2 4 4 2 6.5 2 C8 2 9.2 2.8 10 4 C10.8 2.8 12 2 13.5 2 C16 2 18 4 18 6.5 C18 11.5 10 17 10 17Z" stroke="white" stroke-width="1.8" fill="none"/>
+            </svg>
+          </button>
+        </div>
+        <div class="listings-grid__info">
+          <div class="listings-grid__row">
+            <span class="listings-grid__location">Inverness, Scotland</span>
+            <span class="listings-grid__rating">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="#222222" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 1 L7.5 4.5 L11 5 L8.5 7.4 L9.1 11 L6 9.2 L2.9 11 L3.5 7.4 L1 5 L4.5 4.5 Z"/></svg>
+              4.78
+            </span>
+          </div>
+          <p class="listings-grid__distance">5,320 miles away · May 9–14</p>
+          <p class="listings-grid__price"><strong>$319</strong> / night</p>
+        </div>
+      </article>
+
+      <article class="listings-grid__card">
+        <div class="listings-grid__photo-wrap">
+          <img class="listings-grid__photo" src="https://picsum.photos/seed/68/400/400" alt="Desert oasis in Sedona, Arizona" loading="lazy"/>
+          <button class="listings-grid__save" aria-label="Save listing">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 17 C10 17 2 11.5 2 6.5 C2 4 4 2 6.5 2 C8 2 9.2 2.8 10 4 C10.8 2.8 12 2 13.5 2 C16 2 18 4 18 6.5 C18 11.5 10 17 10 17Z" stroke="white" stroke-width="1.8" fill="none"/>
+            </svg>
+          </button>
+        </div>
+        <div class="listings-grid__info">
+          <div class="listings-grid__row">
+            <span class="listings-grid__location">Sedona, Arizona</span>
+            <span class="listings-grid__rating">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="#222222" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 1 L7.5 4.5 L11 5 L8.5 7.4 L9.1 11 L6 9.2 L2.9 11 L3.5 7.4 L1 5 L4.5 4.5 Z"/></svg>
+              4.91
+            </span>
+          </div>
+          <p class="listings-grid__distance">421 miles away · Feb 22–27</p>
+          <p class="listings-grid__price"><strong>$89</strong> / night</p>
+        </div>
+      </article>
+
+      <article class="listings-grid__card">
+        <div class="listings-grid__photo-wrap">
+          <img class="listings-grid__photo" src="https://picsum.photos/seed/71/400/400" alt="Treehouse retreat in Asheville, North Carolina" loading="lazy"/>
+          <button class="listings-grid__save" aria-label="Save listing">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 17 C10 17 2 11.5 2 6.5 C2 4 4 2 6.5 2 C8 2 9.2 2.8 10 4 C10.8 2.8 12 2 13.5 2 C16 2 18 4 18 6.5 C18 11.5 10 17 10 17Z" stroke="white" stroke-width="1.8" fill="none"/>
+            </svg>
+          </button>
+        </div>
+        <div class="listings-grid__info">
+          <div class="listings-grid__row">
+            <span class="listings-grid__location">Asheville, North Carolina</span>
+            <span class="listings-grid__rating">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="#222222" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 1 L7.5 4.5 L11 5 L8.5 7.4 L9.1 11 L6 9.2 L2.9 11 L3.5 7.4 L1 5 L4.5 4.5 Z"/></svg>
+              4.70
+            </span>
+          </div>
+          <p class="listings-grid__distance">687 miles away · Mar 5–10</p>
+          <p class="listings-grid__price"><strong>$155</strong> / night</p>
+        </div>
+      </article>
+
+      <article class="listings-grid__card">
+        <div class="listings-grid__photo-wrap">
+          <img class="listings-grid__photo" src="https://picsum.photos/seed/84/400/400" alt="Overwater bungalow in Bora Bora, French Polynesia" loading="lazy"/>
+          <button class="listings-grid__save" aria-label="Save listing">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 17 C10 17 2 11.5 2 6.5 C2 4 4 2 6.5 2 C8 2 9.2 2.8 10 4 C10.8 2.8 12 2 13.5 2 C16 2 18 4 18 6.5 C18 11.5 10 17 10 17Z" stroke="white" stroke-width="1.8" fill="none"/>
+            </svg>
+          </button>
+        </div>
+        <div class="listings-grid__info">
+          <div class="listings-grid__row">
+            <span class="listings-grid__location">Bora Bora, French Polynesia</span>
+            <span class="listings-grid__rating">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="#222222" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 1 L7.5 4.5 L11 5 L8.5 7.4 L9.1 11 L6 9.2 L2.9 11 L3.5 7.4 L1 5 L4.5 4.5 Z"/></svg>
+              4.99
+            </span>
+          </div>
+          <p class="listings-grid__distance">7,748 miles away · Jun 14–19</p>
+          <p class="listings-grid__price"><strong>$420</strong> / night</p>
+        </div>
+      </article>
+
+    </div>
   </main>
-  <footer>Made by Hugh Jordan</footer>
+
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <span>© 2024 Airbnb, Inc.</span>
+      <span>·</span>
+      <a href="#" rel="noopener noreferrer">Privacy</a>
+      <span>·</span>
+      <a href="#" rel="noopener noreferrer">Terms</a>
+      <span>·</span>
+      <a href="#" rel="noopener noreferrer">Sitemap</a>
+      <span>·</span>
+      <a href="#" rel="noopener noreferrer">Company details</a>
+    </div>
+  </footer>
+
 </body>
 </html>
