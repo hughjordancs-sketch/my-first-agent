@@ -18,32 +18,91 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      background: #0d1117;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       color: #e2e8f0;
       padding: 2rem;
+      overflow: hidden;
+    }
+
+    /* Decorative background blobs */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    body::before {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #3182ce, transparent 70%);
+      top: -120px;
+      right: -100px;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    body::after {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #805ad5, transparent 70%);
+      bottom: -100px;
+      left: -80px;
+      animation: drift 15s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0, 0); }
+      to   { transform: translate(40px, 30px); }
+    }
+
+    main {
+      display: contents;
     }
 
     .card {
+      position: relative;
       text-align: center;
       padding: 3.5rem 4rem;
-      background: rgba(255, 255, 255, 0.05);
+      /* Solid fallback for browsers without backdrop-filter */
+      background: #1a2035;
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 20px;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       max-width: 560px;
       width: 100%;
+      animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @supports not (backdrop-filter: blur(1px)) {
+      .card { background: #1a2035; }
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .badge {
       display: inline-block;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: #63b3ed;
       background: rgba(99, 179, 237, 0.1);
-      border: 1px solid rgba(99, 179, 237, 0.25);
+      border: 1px solid rgba(99, 179, 237, 0.3);
       border-radius: 999px;
       padding: 0.35rem 1rem;
       margin-bottom: 1.5rem;
@@ -54,11 +113,16 @@
       font-weight: 700;
       letter-spacing: -0.02em;
       line-height: 1.15;
-      color: #f7fafc;
+      /* Solid fallback before gradient is applied */
+      color: #76e4f7;
       margin-bottom: 1rem;
     }
 
-    h1 span {
+    h1 .plain {
+      color: #f7fafc;
+    }
+
+    h1 .gradient {
       background: linear-gradient(90deg, #63b3ed, #76e4f7);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -75,39 +139,48 @@
     .cta {
       display: inline-block;
       padding: 0.8rem 2rem;
-      background: linear-gradient(90deg, #3182ce, #2b6cb0);
+      background: linear-gradient(135deg, #3182ce, #2b6cb0);
       color: #fff;
       font-size: 0.95rem;
       font-weight: 600;
       border-radius: 10px;
       text-decoration: none;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
-      box-shadow: 0 4px 15px rgba(49, 130, 206, 0.35);
+      box-shadow: 0 4px 20px rgba(49, 130, 206, 0.4);
     }
 
     .cta:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(49, 130, 206, 0.5);
+      box-shadow: 0 8px 28px rgba(49, 130, 206, 0.55);
     }
 
     .cta:active {
       transform: translateY(0);
+      box-shadow: 0 4px 20px rgba(49, 130, 206, 0.4);
+    }
+
+    .cta:focus-visible {
+      outline: 2px solid #76e4f7;
+      outline-offset: 4px;
     }
 
     footer {
-      margin-top: 2.5rem;
+      margin-top: 2rem;
       font-size: 0.8rem;
-      color: #4a5568;
+      color: #718096;
+      animation: rise 0.6s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="badge">First Project</div>
-    <h1>Hello, <span>World.</span></h1>
-    <p class="subtitle">Building things on the web, one line at a time.<br>This is where it starts.</p>
-    <a href="https://github.com/hughjordancs-sketch/my-first-agent" class="cta">View on GitHub</a>
-  </div>
+  <main>
+    <div class="card">
+      <div class="badge">First Project</div>
+      <h1><span class="plain">Hello, </span><span class="gradient">World.</span></h1>
+      <p class="subtitle">Building things on the web, one line at a time. This is where it starts.</p>
+      <a href="https://github.com/hughjordancs-sketch/my-first-agent" class="cta">View on GitHub</a>
+    </div>
+  </main>
   <footer>Made by Hugh Jordan</footer>
 </body>
 </html>
