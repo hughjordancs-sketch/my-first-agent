@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Hugh Jordan's first web project — a clean, modern landing page.">
-  <title>Hello, World</title>
+  <meta name="description" content="Hugh Jordan — building on the web, one line at a time.">
+  <meta property="og:title" content="Hugh Jordan">
+  <meta property="og:description" content="Building on the web, one line at a time.">
+  <meta property="og:type" content="website">
+  <title>Hugh Jordan</title>
   <style>
     *, *::before, *::after {
       margin: 0;
@@ -18,22 +21,24 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: #0d1117;
+      background-color: #0d1117;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 24px 24px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       color: #e2e8f0;
       padding: 2rem;
-      overflow: hidden;
+      overflow-x: clip;
     }
 
-    /* Decorative background blobs */
     body::before,
     body::after {
       content: '';
       position: fixed;
       border-radius: 50%;
       filter: blur(80px);
-      opacity: 0.25;
+      opacity: 0.2;
       pointer-events: none;
+      z-index: 0;
     }
 
     body::before {
@@ -59,30 +64,6 @@
       to   { transform: translate(40px, 30px); }
     }
 
-    main {
-      display: contents;
-    }
-
-    .card {
-      position: relative;
-      text-align: center;
-      padding: 3.5rem 4rem;
-      /* Solid fallback for browsers without backdrop-filter */
-      background: #1a2035;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      max-width: 560px;
-      width: 100%;
-      animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-
-    @supports not (backdrop-filter: blur(1px)) {
-      .card { background: #1a2035; }
-    }
-
     @keyframes rise {
       from {
         opacity: 0;
@@ -92,6 +73,35 @@
         opacity: 1;
         transform: translateY(0);
       }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body::before,
+      body::after { animation: none; }
+      .card, footer { animation: none; opacity: 1; transform: none; }
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .card {
+      text-align: center;
+      padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 6vw, 4rem);
+      background: #1a2035;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @supports not (backdrop-filter: blur(1px)) {
+      .card { background: #1a2035; }
     }
 
     .badge {
@@ -113,14 +123,11 @@
       font-weight: 700;
       letter-spacing: -0.02em;
       line-height: 1.15;
-      /* Solid fallback before gradient is applied */
       color: #76e4f7;
       margin-bottom: 1rem;
     }
 
-    h1 .plain {
-      color: #f7fafc;
-    }
+    h1 .plain { color: #f7fafc; }
 
     h1 .gradient {
       background: linear-gradient(90deg, #63b3ed, #76e4f7);
@@ -164,7 +171,46 @@
       outline-offset: 4px;
     }
 
+    .icon-links {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .icon-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 8px;
+      color: #718096;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      text-decoration: none;
+      transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .icon-link:hover {
+      color: #e2e8f0;
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .icon-link:focus-visible {
+      outline: 2px solid #76e4f7;
+      outline-offset: 4px;
+    }
+
+    .icon-link svg {
+      width: 1.1rem;
+      height: 1.1rem;
+      fill: currentColor;
+    }
+
     footer {
+      position: relative;
+      z-index: 1;
       margin-top: 2rem;
       font-size: 0.8rem;
       color: #718096;
@@ -179,6 +225,13 @@
       <h1><span class="plain">Hello, </span><span class="gradient">World.</span></h1>
       <p class="subtitle">Building things on the web, one line at a time. This is where it starts.</p>
       <a href="https://github.com/hughjordancs-sketch/my-first-agent" class="cta">View on GitHub</a>
+      <div class="icon-links">
+        <a href="https://github.com/hughjordancs-sketch" class="icon-link" aria-label="GitHub profile">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+          </svg>
+        </a>
+      </div>
     </div>
   </main>
   <footer>Made by Hugh Jordan</footer>
